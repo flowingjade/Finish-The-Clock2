@@ -1,12 +1,12 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "finishTheClock",
   "version": "1.0",
   "description": "Block certain websites until you complete your tasks.",
   "icons":{
     "48": "icons8-hourglass-48.png"
   },
-  "browser_action": {
+  "action": {
     "default_icon": "icons8-hourglass-48.png",
     "default_title": "finishTheClock",
     "default_popup": "popup.html"
