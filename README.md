@@ -32,5 +32,6 @@ A chrome extension that tracks your tasks and blocks websites.
 ![image](https://github.com/flowingjade/Finish-The-Clock2/assets/89887340/6cc290ed-1813-43c0-90c9-50ba8c1024ef)
 - Allows you to adjust timer duration
 - Add and remove websites to block
+![image](https://github.com/flowingjade/Finish-The-Clock2/assets/89887340/41a714e9-dbf9-4cc7-b41e-37c58ee5c478)
 ## Additions:
 - Make sure your notifications are on to receive a notification when timers are up!
