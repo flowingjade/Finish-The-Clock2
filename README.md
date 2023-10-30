@@ -8,17 +8,17 @@ A chrome extension that tracks your tasks and blocks websites.
 ![image](https://github.com/flowingjade/Finish-The-Clock2/assets/89887340/1290ec95-95c0-43f6-9939-d1a328485cfe)
   ### 1. Start and Reset Timer:
   ![image](https://github.com/flowingjade/Finish-The-Clock2/assets/89887340/cdca1154-2115-4972-a683-7e70c2fd27f9)
-    - Click on Start Timer to start the timer. 
-    - Click again to pause the timer. 
-    - Click Reset Timer to set the timer back to the original time.
+  * Click on Start Timer to start the timer. 
+  *  Click again to pause the timer.
+  *   Click Reset Timer to set the timer back to the original time.
   ### 2. Add and Remove Tasks:
   ![image](https://github.com/flowingjade/Finish-The-Clock2/assets/89887340/dcf008e2-4d1e-4319-80a1-8481a4ed64ba)
-    - Click on Add Task to add a new task. 
-    - Click on X to remove the task.
+  * Click on Add Task to add a new task.
+  * Click on X to remove the task.
   ### 3. Countdown:
   ![image](https://github.com/flowingjade/Finish-The-Clock2/assets/89887340/e8433902-237f-44b4-b38b-7057944bfcd2)
-    - Click on Start Countdown and have some fun!
-    - Make sure to remove the websites blocked in the options page to access all the distractions!
+  * Click on Start Countdown and have some fun!
+  *  Make sure to remove the websites blocked in the options page to access all the distractions!
 
 
   ## [Download Link](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/flowingjade/Finish-The-Clock2):
