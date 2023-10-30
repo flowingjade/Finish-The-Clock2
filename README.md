@@ -1,7 +1,7 @@
 # Finish-The-Clock2
 A chrome extension that tracks your tasks and blocks websites.\
   ## Download Link:
-https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/flowingjade/Finish-The-Clock2\
+https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/flowingjade/Finish-The-Clock2 \
   After Download, click on the small puzzle piece to open your extensions.\
 ![image](https://github.com/flowingjade/Finish-The-Clock2/assets/89887340/2d13a5cf-9aa6-4614-98e3-a3e520f5bc5e)\
   Click on manage extensions:\
