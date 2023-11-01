@@ -19,117 +19,162 @@ chrome.storage.local.get(["timeOption"], (res)=>{
     timeOption.value = res.timeOption
 })
 
-let urls = []; // Global variable to store URLs
-
-// Load init when the content is loaded.
-window.addEventListener('DOMContentLoaded', init);
-window.addEventListener('DOMContentLoaded', loadList);
-
-
-//Init Function - Initialize, load, addEventListeners
-function init() {
-    const addButton = document.getElementById('add');
-    const deleteButton = document.getElementsByClassName('delete');
-    const noWebsiteMsg = document.getElementById('no-website-msg');
-    chrome.storage.local.getBytesInUse(['websites'], function (bytes) {
-        if (bytes) {
-            chrome.storage.local.get("websites", function (res) {
-                if (res != {}) {
-                    urls = JSON.parse(res.websites);
-                    if (urls == undefined || urls.length == 0) {
-                        noWebsiteMsg.style.display = "";
-                    } else {
-                        noWebsiteMsg.style.display = "none";
-                    }
-                    if (deleteButton) {
-                        for (let i = 0; i < deleteButton.length; i++) {
-                            deleteButton[i].addEventListener('click', function (e) {
-                                deleteWebsite(e);
-                            });
-                        }
-                    }
-                }
-            });
-
-        } else {
-            urls = [];
+var background = (function () {
+    let tmp = {};
+    chrome.runtime.onMessage.addListener(function (request) {
+      for (let id in tmp) {
+        if (tmp[id] && (typeof tmp[id] === "function")) {
+          if (request.path === "background-to-options") {
+            if (request.method === id) {
+              tmp[id](request.data);
+            }
+          }
         }
+      }
     });
-    addButton.addEventListener('click', function () {
-        const url = document.getElementsByClassName('add-website')[0].value;
-        if (url.length > 0) {
-            noWebsiteMsg.style.display = "none";
-            urls.push(url + "/*");
-            chrome.storage.local.set({
-                "websites": JSON.stringify(urls)
-            }, function (value) {
-                console.log(value);
-            });
-            save();
-            loadList();
-            document.getElementsByClassName('add-website')[0].value = "";
+    /*  */
+    return {
+      "receive": function (id, callback) {
+        tmp[id] = callback;
+      },
+      "send": function (id, data) {
+        chrome.runtime.sendMessage({
+          "method": id, 
+          "data": data,
+          "path": "options-to-background"
+        }, function () {
+          return chrome.runtime.lastError;
+        });
+      }
+    }
+  })();
+  
+  var config = {
+    "blocklist": {
+      "domains": {}, 
+      "iframes": {}
+    },
+    "update": function () {
+      config.fill.blocked.iframes();
+      config.fill.blocked.domains();
+    },
+    "load": function () {
+      const test = document.getElementById("test");
+      const reload = document.getElementById("reload");
+      const support = document.getElementById("support");
+      const donation = document.getElementById("donation");
+      /*  */
+      //test.addEventListener("click", function () {background.send("test")}, false);
+      //reload.addEventListener("click", function () {document.location.reload()}, false);
+      //support.addEventListener("click", function () {background.send("support")}, false);
+      //donation.addEventListener("click", function () {background.send("donation")}, false);
+      /*  */
+      document.getElementById("add-iframe").addEventListener("click", config.add.iframe);
+      document.getElementById("add-domain").addEventListener("click", config.add.domain);
+      document.getElementById("block-iframe").addEventListener("keypress", function (e) {if (e.key === "Enter") config.add.iframe()});
+      document.getElementById("block-domain").addEventListener("keypress", function (e) {if (e.key === "Enter") config.add.domain()});
+      /*  */
+      config.update();
+      window.removeEventListener("load", config.load, false);
+    },
+    "add": {
+      "domain": function () {config.add.action("block-domain", "blocklist", config.blocklist.domains)},
+      "iframe": function () {config.add.action("block-iframe", "blocklist-iframes", config.blocklist.iframes)},
+      "action": function (id, key, blocklist) {
+        let domain = document.getElementById(id).value.trim();
+        if (domain) {
+          if (domain.indexOf("*://") === 0) {
+            blocklist[domain] = null;
+          } else {
+            domain = domain.replace("https://", '').replace("http://", '').replace("ftp://", '');
+            /*  */
+            let hostname = new URL("https://" + domain).hostname;
+            blocklist[hostname.replace("www.", '')] = null;
+          }
+          /*  */
+          background.send(key, blocklist);
         }
-    });
-}
-
-function loadList() {
-    const deleteButton = document.getElementsByClassName('delete');
-    const tblNode = document.getElementsByTagName('body')[0];
-    let tblRow = document.createElement('tr');
-    let tblData = document.createElement('td');
-    let tblButton = document.createElement('button');
-    let storedURLs = [];
-    chrome.storage.local.getBytesInUse(['websites'], function (bytes) {
-        if (bytes) {
-            chrome.storage.local.get("websites", function (res) {
-                if (res != {}) {
-                    storedURLs = JSON.parse(res.websites);
-
-                    if (storedURLs != undefined || storedURLs != []) {
-                        for (let i = 0; i < storedURLs.length; i++) {
-                            tblButton.innerText = "-";
-                            tblButton.setAttribute('class', 'delete');
-                            tblRow.setAttribute('id', "row" + i);
-                            tblButton.setAttribute('id', i);
-                            tblData.innerText = storedURLs[i];
-                            tblRow.appendChild(tblData);
-                            tblRow.appendChild(tblButton);
-                            document.getElementsByTagName('table')[0].appendChild(tblRow);
-                            if (deleteButton) {
-
-                                deleteButton[i].addEventListener('click', function (e) {
-                                    deleteWebsite(e);
-                                });
-
-                            }
-                        }
-                    }
-
-                }
-            });
-
-        } else {
-            storedURLs = [];
+      }
+    },
+    "fill": {
+      "blocked": {
+        "iframes": function () {
+          chrome.storage.local.get(null, function (storage) {
+            document.getElementById("block-iframe").focus();
+            document.getElementById("block-iframe").value = '';
+            /*  */
+            config.blocklist.iframes = "blocklist-iframes" in storage ? storage["blocklist-iframes"] : {};
+            config.iterate("blocklist-iframes", "blocklist-iframes", config.blocklist.iframes);
+          });
+        },
+        "domains": function () {
+          chrome.storage.local.get(null, function (storage) {
+            document.getElementById("block-domain").focus();
+            document.getElementById("block-domain").value = '';
+            /*  */
+            config.blocklist.domains = "blocklist" in storage ? storage["blocklist"] : {};
+            config.iterate("blocklist", "blocklist-domains", config.blocklist.domains);
+          });
         }
-    });
-
-}
-
-function deleteWebsite(e) {
-    urls.splice(e.target.id, 1);
-    chrome.storage.local.set({
-        "websites": JSON.stringify(urls)
-    }, function () {});
-    if (document.getElementById("row" + e.target.id))
-        document.getElementById("row" + e.target.id).remove();
-    save();
-    init();
-}
-
-function save() {
-    chrome.extension.sendRequest({
-        urls: "save"
-    }, function (response) {
-
-    });
-}
+      }
+    },
+    "iterate": function (key, id, blocklist) {    
+      let count = 1;
+      let tbody = document.getElementById(id);
+      tbody.textContent = '';
+      /*  */
+      for (let domain in blocklist) {
+        const item = document.createElement("tr");
+        const close = document.createElement("td");
+        const number = document.createElement("td");
+        const blocked = document.createElement("td");
+        const redirect = document.createElement("td");
+        const input = document.createElement("input");
+        /*  */
+        close.setAttribute("type", "close");
+        number.setAttribute("type", "number");
+        blocked.setAttribute("type", "blocked");
+        redirect.setAttribute("type", "redirect");
+        /*  */
+        number.textContent = count;
+        blocked.textContent = domain.indexOf("*://") === 0 ? domain : "*://" + domain + "/*";
+        /*  */
+        input.setAttribute("key", key);
+        input.setAttribute("type", "text");
+        input.setAttribute("blocked", domain);
+        input.value = blocklist[domain] || '';
+        input.setAttribute("placeholder", "i.e. https://www.google.com/");
+        input.addEventListener("change", function (e) {
+          chrome.storage.local.get(null, function (storage) {
+            let key = e.target.getAttribute("key");
+            let blocklist = key in storage ? storage[key] : {};
+            blocklist[e.target.getAttribute("blocked")] = e.target.value;
+            background.send(key, blocklist);
+          });
+        });
+        /*  */
+        close.setAttribute("key", key);
+        close.setAttribute("blocked", domain);
+        close.addEventListener("click", function (e) {
+          chrome.storage.local.get(null, function (storage) {
+            let key = e.target.getAttribute("key");
+            let blocklist = key in storage ? storage[key] : {};
+            delete blocklist[e.target.getAttribute("blocked")];
+            background.send(key, blocklist);
+          });
+        });
+        /*  */
+        item.appendChild(number);
+        item.appendChild(blocked);
+        redirect.appendChild(input);
+        item.appendChild(redirect);
+        item.appendChild(close);
+        tbody.appendChild(item);
+        /*  */
+        count++;
+      }
+    }
+  };
+  
+  background.receive("update", config.update);
+  window.addEventListener("load", config.load, false);
