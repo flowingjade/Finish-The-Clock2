@@ -9,7 +9,7 @@
   "action": {
     "default_icon": "icons8-hourglass-48.png",
     "default_title": "finishTheClock",
-    "default_popup": "popup/popup.html"
+    "default_popup": "popup.html"
 },
 "offline_enabled": true,
 "commands": {
