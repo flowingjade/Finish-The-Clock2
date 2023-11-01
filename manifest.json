@@ -9,14 +9,21 @@
   "action": {
     "default_icon": "icons8-hourglass-48.png",
     "default_title": "finishTheClock",
-    "default_popup": "popup.html"
-  },
+    "default_popup": "popup/popup.html"
+},
+"offline_enabled": true,
+"commands": {
+  "_execute_action": {}
+},
   "permissions": ["storage","alarms","notifications",
-      "webRequest", "webRequestBlocking",
-      "http://*/*", "https://*/*"
+      "webRequest", "declarativeNetRequest","contextMenus"
+      
 ],
+  "host_permissions":[
+    "*://*/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },
-  "options_page": "options.html"
+  "options_page": "options/options.html"
 }
